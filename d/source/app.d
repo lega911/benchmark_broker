@@ -74,7 +74,7 @@ void handler(TCPConnection conn) {
             //writeln(now, " - ", start, " = ", duration);
             writeln(duration, " > ", counter * 1000 / duration);
             counter = 0;
-            start = now;
+            start = getTickMs();
         }
     }
 }

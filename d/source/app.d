@@ -6,6 +6,7 @@ import std.stdio;
 TCPConnection[] workers;
 bool logging;
 ulong counter;
+long start;
 
 shared static this()
 {
@@ -40,7 +41,7 @@ void handler(TCPConnection conn) {
     writeln("Client connected");
     TCPConnection worker;
     ubyte[64] req, resp;
-    long start = getTickMs();
+    start = getTickMs();
     while(conn.connected){
         // read client
         if(!conn.waitForData(dur!"seconds"(100L))) {

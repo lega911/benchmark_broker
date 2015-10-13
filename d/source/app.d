@@ -30,17 +30,17 @@ void worker_handler(TCPConnection conn) {
     writeln("Worker disconected");
 }
 
-long getTickMs() nothrow @nogc
-{
-    import core.time;
-    return convClockFreq(MonoTime.currTime.ticks, MonoTime.ticksPerSecond, 1_000);
+void log(T...)(T args) {
+    import std.datetime;
+    write(Clock.currTime().toSimpleString(), '\t', args, '\n');
 }
 
 void handler(TCPConnection conn) {
-    writeln("Client connected");
+    auto clientId = conn.remoteAddress.port;
+    log("Client connected, id: ", clientId);
     TCPConnection worker;
     ubyte[64] req, resp;
-    
+
     StopWatch sw;
     sw.start();
 
@@ -75,7 +75,7 @@ void handler(TCPConnection conn) {
             sw.stop();
             auto duration = sw.peek().msecs;
             //writeln(now, " - ", start, " = ", duration);
-            writeln(duration, " > ", counter * 1000 / duration);
+            log("client id: ", clientId, '\t', duration, " > ", counter * 1000 / duration);
 
             counter = 0;
             sw.reset();

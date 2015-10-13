@@ -40,7 +40,10 @@ void handler(TCPConnection conn) {
     writeln("Client connected");
     TCPConnection worker;
     ubyte[64] req, resp;
-    long start = getTickMs();
+    
+    StopWatch sw;
+    sw.start();
+
     while(conn.connected){
         // read client
         if(!conn.waitForData(dur!"seconds"(100L))) {
@@ -69,12 +72,14 @@ void handler(TCPConnection conn) {
 
         counter++;
         if(counter > 60000) {
-            long now = getTickMs();
-            auto duration = now - start;
+            sw.stop();
+            auto duration = sw.peek().msecs;
             //writeln(now, " - ", start, " = ", duration);
             writeln(duration, " > ", counter * 1000 / duration);
+
             counter = 0;
-            start = getTickMs();
+            sw.reset();
+            sw.start();
         }
     }
 }

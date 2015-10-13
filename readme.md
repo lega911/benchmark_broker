@@ -8,7 +8,7 @@ $ go build go/broker.go
 ## Start broker
 
 ```sh
-cd d && dub
+cd d && dub --build=release
 ```
 or
 ```sh

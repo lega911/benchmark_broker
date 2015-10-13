@@ -1,3 +1,19 @@
+/*
+1734 > 34602
+2884 > 20804
+4520 > 13274
+6157 > 9745
+7800 > 7692
+9444 > 6353
+11083 > 5413
+12725 > 4715
+14363 > 4177
+16464 > 3644
+16522 > 3631
+16561 > 3623
+
+*/
+
 import vibe.d;
 import core.time;
 import std.stdio;
@@ -15,8 +31,25 @@ shared static this()
         listenTCP_s(4001, &worker_handler);
     });
 
-    writeln("Start client connector");
-    listenTCP_s(4000, &handler);
+    runTask({
+        writeln("Start client connector");
+        listenTCP_s(4000, &handler);
+    });
+
+    // 10 workers
+    for(auto i=0;i<10;i++) {
+        runTask({
+            runWorker();
+        });        
+    }
+
+    // 10 clients
+    for(auto i=0;i<9;i++) {
+        runTask({
+            runClient();
+        });        
+    }
+    runClient();
 }
 
 void worker_handler(TCPConnection conn) {
@@ -78,3 +111,31 @@ void handler(TCPConnection conn) {
         }
     }
 }
+
+
+void runWorker() {
+    ubyte[64] buf;
+    auto conn = connectTCP("localhost", 4001);
+
+    while(conn.connected){
+        conn.read(buf);
+        conn.write(buf);
+    }
+};
+
+
+void runClient() {
+    ubyte[64] buf, msg;
+    for(auto i=0;i<64;i++) {
+        msg[i] = ubyte(i & 0xff);
+    }
+
+    sleep(500.msecs);
+
+    auto conn = connectTCP("localhost", 4000);
+
+    while(conn.connected){
+        conn.write(msg);
+        conn.read(buf);
+    }
+};
